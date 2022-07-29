@@ -12,15 +12,10 @@ export default function HomePage() {
   const startGame = useStore(state => state.startGame);
   const toggleModalOpen = useStore(state => state.toggleModalOpen);
 
-  function handleLinkClick(gameType: GameType) {
+  const handleClick = (gameType?: GameType) => () => {
     playAudio(C.clickSound);
-    startGame(gameType);
-  }
-
-  function handleBtnClick() {
-    playAudio(C.clickSound);
-    toggleModalOpen(<Settings />);
-  }
+    gameType ? startGame(gameType) : toggleModalOpen(<Settings />);
+  };
 
   return (
     <AnimatedContainer>
@@ -30,21 +25,24 @@ export default function HomePage() {
             <S.TitleBegin>Art</S.TitleBegin>Quiz
             <S.Version>v.2 marathon</S.Version>
           </S.Title>
+
           <S.Link
             to='artQuestion/1'
-            onClick={() => handleLinkClick('artQuestion')}
+            onClick={handleClick('artQuestion')}
             replace
           >
             угадай художника
           </S.Link>
+
           <S.Link
             to='paintQuestion/1'
-            onClick={() => handleLinkClick('paintQuestion')}
+            onClick={handleClick('paintQuestion')}
             replace
           >
             угадай картину
           </S.Link>
-          <S.Btn onClick={handleBtnClick}>
+
+          <S.Btn onClick={handleClick()}>
             <S.Icon icon={faGear} />
             Настройки
           </S.Btn>

@@ -14,5 +14,5 @@ export default {
   wrongAnswSound: new Audio(wrongAnswSoundSrc),
   timeOverSound: new Audio(timeOverSoundSrc),
   gameEndSound: new Audio(gameEndSoundSrc),
-  baseImgSrc: isDev ? '/src/assets/img/' : '/assets/img/',
+  imgBaseSrc: isDev ? '/src/assets/img/' : '/assets/img/',
 };

@@ -21,31 +21,32 @@ export default function GameInfo({ isTimerStopped }: Props) {
   );
 
   const { current: maxValue } = useRef(
-    10 * +localStorage.getItem('artQuiz_time')!
+    50 * +localStorage.getItem('artQuiz_time')!
   );
 
-  const [isTimeRunOut, setIsTimeRunOut] = useState(maxValue === 50);
+  const [isTimeRunOut, setIsTimeRunOut] = useState(maxValue === 250);
 
   const { current: isTimed } = useRef(getIsTimed());
   const progress = useRef<HTMLProgressElement | null>(null);
-  let { current: timerId } = useRef<number | null>(null);
-  const timerFlag = useRef(isTimerStopped);
+  const timerId = useRef<number | null>(null);
+
+  function timerCallBack() {
+    const { value } = progress.current!;
+    maxValue !== 250 && value === 250 && setIsTimeRunOut(true);
+    value || clearInterval(timerId.current!);
+    requestAnimationFrame(() => (progress.current!.value -= 1));
+  }
 
   useEffect(() => {
     if (isTimed) {
       progress.current!.value = maxValue;
-      timerId = setInterval(() => {
-        const { value } = progress.current!;
-        if (maxValue !== 50 && value === 50) setIsTimeRunOut(true);
-        if (timerFlag.current || !value) clearInterval(timerId!);
-        progress.current!.value -= 1;
-      }, 100);
+      timerId.current = setInterval(timerCallBack, 20);
     }
-    return () => clearInterval(timerId!);
+    return () => clearInterval(timerId.current!);
   }, []);
 
   useEffect(() => {
-    timerFlag.current = isTimerStopped;
+    isTimerStopped && clearInterval(timerId.current!);
   }, [isTimerStopped]);
 
   return (
@@ -53,6 +54,7 @@ export default function GameInfo({ isTimerStopped }: Props) {
       <S.Link to='/' replace>
         <FontAwesomeIcon icon={faHouseChimney} />
       </S.Link>
+
       {isTimed && (
         <S.ProgressBar
           isTimeRunOut={isTimeRunOut}
@@ -60,6 +62,7 @@ export default function GameInfo({ isTimerStopped }: Props) {
           max={maxValue}
         />
       )}
+
       <S.Wrapper>
         <S.HeartIcon icon={faHeart} />
         <S.Text>× {lifes}</S.Text>

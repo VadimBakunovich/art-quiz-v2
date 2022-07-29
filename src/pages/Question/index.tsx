@@ -5,30 +5,37 @@ import { useStore } from 'store';
 import {
   getLevelParams,
   getStopTimerFlag,
-  getTimer,
-  doActions,
+  getIsTimed,
   playAudio,
   stopAudio,
 } from 'utils';
+
 import { AnimatedContainer } from 'components/AnimatedContainer';
 import ArtQuestion from 'components/ArtQuestion';
-import { PaintQuestion } from 'components/PaintQuestion';
+import PaintQuestion from 'components/PaintQuestion';
 import GameInfo from 'components/GameInfo';
+import Answer from 'components/AppModal/Answer';
+import GameOver from 'components/AppModal/GameOver';
+import Finish from 'components/AppModal/Finish';
+
 import Painting from 'interfaces';
 import C from 'constants';
 import S from './styled';
 
 export default function Question() {
   const gameType = useStore(state => state.gameType);
+
   const lifes = useStore(state => state.lifes);
   const setLifes = useStore(state => state.setLifes);
-  const rightAnswInRow = useStore(state => state.rightAnswInRow);
 
+  const rightAnswInRow = useStore(state => state.rightAnswInRow);
   const setRightAnswInRow = useStore(state => state.setRightAnswInRow);
+
   const { current: questionVariants } = useRef(
     useStore.getState().questionVariants
   );
   const setQuestionVariants = useStore(state => state.setQuestionVariants);
+
   const toggleModalOpen = useStore(state => state.toggleModalOpen);
 
   const [{ rightAnswer, answerVariants, newVariants }] = useState(() =>
@@ -36,32 +43,59 @@ export default function Question() {
   );
 
   const answer = useRef<Painting | null>(null);
+  const timerId = useRef<number | null>(null);
 
-  let { current: timerId } = useRef<number | null>(null);
+  function performActions(isLifeAdded: boolean) {
+    setQuestionVariants(newVariants);
+
+    const isGameOver =
+      lifes === 1 && answer.current?.author !== rightAnswer.author
+        ? true
+        : false;
+
+    const content = isGameOver ? (
+      <GameOver userAnswer={answer.current} />
+    ) : newVariants.length < 4 ? (
+      <Finish />
+    ) : (
+      <Answer
+        userAnswer={answer.current}
+        rightAnswer={rightAnswer}
+        isLifeAdded={isLifeAdded!}
+      />
+    );
+    toggleModalOpen(content);
+  }
+
+  function doIfWrongAnswer(sound: HTMLAudioElement) {
+    playAudio(sound);
+    setLifes(false); // causes rerender
+    setRightAnswInRow(false); // causes rerender
+  }
+
+  function startTimer() {
+    const delay = +(localStorage.getItem('artQuiz_time') ?? 30) * 1000;
+    playAudio(C.tickSound);
+
+    return setTimeout(() => {
+      stopAudio(C.tickSound);
+      doIfWrongAnswer(C.timeOverSound);
+      performActions(false);
+    }, delay);
+  }
 
   useEffect(() => {
-    if (gameType) {
-      timerId = getTimer({
-        userAnswer: null,
-        rightAnswer,
-        newVariants,
-        lifes,
-        setLifes,
-        setRightAnswInRow,
-        setQuestionVariants,
-        toggleModalOpen,
-      });
-      if (timerId) playAudio(C.tickSound);
-    }
+    gameType && getIsTimed() && (timerId.current = startTimer());
 
     return () => {
-      if (timerId) clearTimeout(timerId);
-      if (!C.tickSound.paused) stopAudio(C.tickSound);
+      timerId.current && clearTimeout(timerId.current!);
+      C.tickSound.paused || stopAudio(C.tickSound);
     };
   }, []);
 
   function checkAnswer(userAnswer: Painting) {
-    if (timerId) clearTimeout(timerId);
+    timerId.current && stopAudio(C.tickSound);
+    timerId.current && clearTimeout(timerId.current!);
 
     playAudio(C.clickSound);
     answer.current = userAnswer;
@@ -69,26 +103,12 @@ export default function Question() {
 
     if (userAnswer.author === rightAnswer.author) {
       playAudio(C.rightAnswSound);
-      setRightAnswInRow(true);
-      if (!((rightAnswInRow + 1) % 5)) {
-        isLifeAdded = true;
-        setLifes(true);
-      }
-    } else {
-      playAudio(C.wrongAnswSound);
-      setRightAnswInRow(false);
-      setLifes(false);
-    }
+      setRightAnswInRow(true); // causes rerender
+      (rightAnswInRow + 1) % 5 || (isLifeAdded = true);
+      (rightAnswInRow + 1) % 5 || setLifes(true); // causes rerender
+    } else doIfWrongAnswer(C.wrongAnswSound);
 
-    doActions({
-      userAnswer,
-      rightAnswer,
-      isLifeAdded,
-      newVariants,
-      lifes,
-      setQuestionVariants,
-      toggleModalOpen,
-    });
+    performActions(isLifeAdded);
   }
 
   const props = {

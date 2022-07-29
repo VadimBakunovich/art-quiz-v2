@@ -1,5 +1,6 @@
 import { SkeletonImg } from 'components/SkeletonImg';
-import { getImgUrl, styleBtn, useImgsOnload } from 'utils';
+import { getImgUrl, styleBtn } from 'utils';
+import { useImgsOnload } from 'hooks';
 import Painting from 'interfaces';
 import S from './styled';
 
@@ -10,7 +11,7 @@ type Props = {
   checkAnswer(userAnswer: Painting): void;
 };
 
-export function PaintQuestion({
+export default function PaintQuestion({
   answerVariants,
   userAnswer,
   rightAnswer,

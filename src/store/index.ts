@@ -4,9 +4,8 @@ import db from 'db.json';
 import Painting, { GameType } from 'interfaces';
 
 interface State {
-  startGame(gameType: GameType): void;
-
   gameType: GameType;
+  startGame(gameType: GameType): void;
 
   questionVariants: Painting[];
   setQuestionVariants(variants: Painting[]): void;
@@ -23,6 +22,7 @@ interface State {
 }
 
 export const useStore = create<State>(set => ({
+  gameType: '',
   startGame: gameType =>
     set(() => ({
       gameType,
@@ -30,8 +30,6 @@ export const useStore = create<State>(set => ({
       lifes: 3,
       rightAnswInRow: 0,
     })),
-
-  gameType: '',
 
   questionVariants: db,
   setQuestionVariants: variants => set(() => ({ questionVariants: variants })),

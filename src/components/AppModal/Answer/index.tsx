@@ -38,6 +38,7 @@ export default function Answer({
       <S.Title isRightAnswer={isRightAnswer}>
         {userAnswer ? (isRightAnswer ? 'Верно' : 'Не верно') : 'Время истекло'}
       </S.Title>
+
       <S.Wrapper>
         <S.InfoIcon icon={faCircleInfo} />
         <S.Text>
@@ -46,6 +47,7 @@ export default function Answer({
             : `Подсказка: картина называется "${name}". Художник написал её в ${year} году.`}
         </S.Text>
       </S.Wrapper>
+
       {isLifeAdded && (
         <div>
           <S.HeartIcon icon={faHeart} />
@@ -55,6 +57,7 @@ export default function Answer({
           </S.Text>
         </div>
       )}
+
       <PopUpLink
         onClick={handleClick}
         to={`${gameType}/${nextQuestionNum}`}

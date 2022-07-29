@@ -1,5 +1,6 @@
 import { SkeletonBigImg } from 'components/SkeletonBigImg';
-import { getImgUrl, paintBtn, useImgOnload } from 'utils';
+import { getImgUrl, paintBtn } from 'utils';
+import { useImgOnload } from 'hooks';
 import Painting from 'interfaces';
 import S from './styled';
 

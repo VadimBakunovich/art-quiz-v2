@@ -51,9 +51,8 @@ export default function Settings() {
   function toggleMuteHandler() {
     setMuted(!isMuted);
     playAudio(C.clickSound, volume.current);
-    if (!localStorage.getItem('artQuiz_volume')) {
+    localStorage.getItem('artQuiz_volume') ||
       localStorage.setItem('artQuiz_volume', '0.5');
-    }
   }
 
   const volumeChangeHandler: Handler = ({ target }) => {
@@ -62,7 +61,7 @@ export default function Settings() {
   };
 
   function getTime(value: number) {
-    return +value < 10 ? `0${value} s` : `${value} s`;
+    return +value < 10 ? `0${value} с` : `${value} с`;
   }
 
   function toggleTimed() {
@@ -77,7 +76,7 @@ export default function Settings() {
   };
 
   function handleClick() {
-    playAudio(C.clickSound);
+    playAudio(C.clickSound, volume.current);
     toggleModalOpen();
   }
 
