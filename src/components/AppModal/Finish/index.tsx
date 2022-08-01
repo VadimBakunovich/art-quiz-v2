@@ -1,20 +1,15 @@
 import { useEffect } from 'react';
 
-import { useStore } from 'store';
+import { useModalClose } from 'hooks';
 import { playAudio } from 'utils';
 import { PopUpLink } from 'components/PopUpLink';
 import C from 'constants';
 import S from './styled';
 
 export default function Finish() {
-  const toggleModalOpen = useStore(state => state.toggleModalOpen);
+  const handleClick = useModalClose();
 
   useEffect(() => playAudio(C.gameEndSound), []);
-
-  function handleClick() {
-    playAudio(C.clickSound);
-    toggleModalOpen();
-  }
 
   return (
     <S.Container>

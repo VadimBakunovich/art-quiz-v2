@@ -1,10 +1,8 @@
 import { faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 
-import { useStore } from 'store';
-import { playAudio } from 'utils';
+import { useModalClose } from 'hooks';
 import { PopUpLink } from 'components/PopUpLink';
 import Painting from 'interfaces';
-import C from 'constants';
 import S from './styled';
 
 type Props = {
@@ -12,12 +10,7 @@ type Props = {
 };
 
 export default function GameOver({ userAnswer }: Props) {
-  const toggleModalOpen = useStore(state => state.toggleModalOpen);
-
-  function handleClick() {
-    playAudio(C.clickSound);
-    toggleModalOpen();
-  }
+  const handleClick = useModalClose();
 
   return (
     <S.Container>

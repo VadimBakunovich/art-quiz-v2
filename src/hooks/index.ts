@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react';
 
-import { getImgUrl } from 'utils';
+import { useStore } from 'store';
+import { getImgUrl, playAudio } from 'utils';
 import Painting from 'interfaces';
+import C from 'constants';
+
+export function useModalClose() {
+  const toggleModalOpen = useStore(state => state.toggleModalOpen);
+
+  return () => {
+    playAudio(C.clickSound);
+    toggleModalOpen();
+  };
+}
 
 export function useImgOnload(src: string) {
   const [isLoaded, setIsLoaded] = useState(false);

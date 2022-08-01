@@ -39,20 +39,6 @@ export function getLevelParams(variants: Painting[]) {
   return { rightAnswer, answerVariants, newVariants };
 }
 
-export function playAudio(
-  audio: HTMLAudioElement,
-  volume = +(localStorage.getItem('artQuiz_volume') ?? 0.5)
-) {
-  audio.volume = volume;
-  const isMuted = JSON.parse(localStorage.getItem('artQuiz_isMuted')!) ?? true;
-  isMuted || audio.play();
-}
-
-export function stopAudio(audio: HTMLAudioElement) {
-  audio.pause();
-  audio.currentTime = 0;
-}
-
 export const paintBtn = (isNotAnswer: boolean, isRightAnswer: boolean) =>
   isNotAnswer
     ? '#282828'
@@ -67,8 +53,24 @@ export const styleBtn = (isNotAnswer: boolean, isRightAnswer: boolean) =>
     ? 'brightness(.4) sepia(1) hue-rotate(50deg) saturate(10)'
     : 'brightness(.4) sepia(1) hue-rotate(-50deg) saturate(6)';
 
+export const getIsMuted = (): boolean =>
+  JSON.parse(localStorage.getItem('artQuiz_isMuted') ?? 'true');
+
 export const getIsTimed = (): boolean =>
-  JSON.parse(localStorage.getItem('artQuiz_isTimed')!) ?? false;
+  JSON.parse(localStorage.getItem('artQuiz_isTimed') ?? 'false');
+
+export function playAudio(
+  audio: HTMLAudioElement,
+  volume = localStorage.getItem('artQuiz_volume') ?? 0.5
+) {
+  audio.volume = +volume;
+  getIsMuted() || audio.play();
+}
+
+export function stopAudio(audio: HTMLAudioElement) {
+  audio.pause();
+  audio.currentTime = 0;
+}
 
 export const getStopTimerFlag = (hasUserAnswer: boolean) =>
   getIsTimed() ? hasUserAnswer : false;

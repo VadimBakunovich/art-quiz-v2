@@ -2,10 +2,9 @@ import { useRef } from 'react';
 import { faCircleInfo, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 import { useStore } from 'store';
-import { playAudio } from 'utils';
+import { useModalClose } from 'hooks';
 import { PopUpLink } from 'components/PopUpLink';
 import Painting from 'interfaces';
-import C from 'constants';
 import S from './styled';
 
 type Props = {
@@ -19,7 +18,8 @@ export default function Answer({
   rightAnswer,
   isLifeAdded,
 }: Props) {
-  const toggleModalOpen = useStore(state => state.toggleModalOpen);
+  const handleClick = useModalClose();
+
   const gameType = useStore(state => state.gameType);
   const { current: nextQuestionNum } = useRef(
     242 - useStore.getState().questionVariants.length
@@ -27,11 +27,6 @@ export default function Answer({
 
   const { author, name, year } = rightAnswer;
   const isRightAnswer = userAnswer?.author === author;
-
-  function handleClick() {
-    playAudio(C.clickSound);
-    toggleModalOpen();
-  }
 
   return (
     <S.Container>
